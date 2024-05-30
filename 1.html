@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>index</title>
+<style>
+    .doc {
+        width: 1280px;
+        height: 2774px;
+        margin: 0 auto;
+    }
+
+    canvas {
+        display: block;
+        border: 2px solid #888;
+    }
+
+    .floating-buttons {
+        position: fixed;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+    }
+
+    .floating-button {
+        background-color: #f44336;
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        text-align: center;
+        font-size: 18px;
+        line-height: 60px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.25);
+        cursor: pointer;
+        transition: width 0.3s ease;
+    }
+
+    .floating-button:hover {
+        background-color: #ff665c;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      display: none;
+    }
+    
+    .modal {
+      width: 400px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      width: 20%;
+      float: left;
+      display: block;
+      font-weight: bold;
+    }
+    
+    .form-group input {
+      width: 70%;
+      padding: 5px;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+    }
+    
+    .button-container {
+      text-align: right;
+    }
+    
+    .button-container button {
+      padding: 5px 10px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    
+    .button-container button + button {
+      margin-left: 5px;
+    }
+</style>
+<script type="text/javascript">
+    document.write("<link rel='stylesheet' href='css/family/family.css?random="+Math.random()+"' type='text/css' rel='stylesheet' \/>");
+    document.write("<script type='text/javascript' src='js/canvas2image.js?random=" + Math.random() + "'><\/script>");
+    document.write("<script type='text/javascript' src='js/dom-to-image.min.js?random=" + Math.random() + "'><\/script>");
+    document.write("<script type='text/javascript' src='js/index.js?random=" + Math.random() + "'><\/script>");
+</script>
+</head>
+<body>
+<div class="doc">
+    <canvas width="1280" height="2774" id="cvs">您的浏览器不支持 HTML5 canvas 标签。请更换浏览器</canvas>
+    <div>
+        <div style="font-family: WeChatSansStdRegular;visibility: hidden;font-size: 0;">WeChatSansStdRegular</div>
+        <div style="font-family: WeChatSansStdMedium;visibility: hidden;font-size: 0;">WeChatSansStdMedium</div>
+        <div style="font-family: WeChatSansStdBold;visibility: hidden;font-size: 0;">WeChatSansStdBold</div>
+        <div style="font-family: WeChatSansStdLight;visibility: hidden;font-size: 0;">WeChatSansStdLight</div>
+        <div style="display: none;">
+            width : <input type="number" value="591" id="imgW" /><br/>
+            height : <input type="number" value="1280" id="imgH" /><br>
+            fileName: <input type="text" placeholder="optional" id="imgFileName"><br/>
+            <button id="save">save</button> or <button id="convert">convert to</button> as: 
+                <select id="sel">
+                    <option value="png">png</option>
+                    <option value="jpeg">jpeg</option>
+                    <option value="bmp">bmp</option>
+                </select><br/>
+        </div>
+    </div>
+    <div id="imgs"></div>
+    <div class="floating-buttons">
+      <div class="floating-button" id="openDialog1">修改</div>
+      <div class="floating-button" id="openDialog2">保存</div>
+    </div>
+</div>
+<div class="overlay">
+    <div class="modal">
+      <form name="pay_form" action="" method="post">
+        <div class="form-group">
+          <label for="firstName">对方名称：</label>
+          <input type="text" id="payName" name="payName" required="required" placeholder="请输入对方名称" />
+        </div>
+        <div class="form-group">
+          <label for="lastName">支付金额：</label>
+          <input type="text" id="payMoney" name="payMoney" required="required" placeholder="请输入支付金额" />
+        </div>
+        <div class="form-group">
+            <label for="lastName">创建时间：</label>
+            <input type="text" id="payTime" name="payTime" required="required" placeholder="请输入创建时间：" />
+        </div>
+        <div class="form-group">
+            <label for="lastName">付款方式：</label>
+            <input type="text" id="methods" name="methods" required="required" placeholder="请输入付款方式：" />
+        </div>
+        <div class="form-group">
+            <label for="lastName">转账备注：</label>
+            <input type="text" id="coremark" name="coremark" required="required" placeholder="请输入转账备注：" />
+        </div>
+        <div class="form-group">
+            <label for="lastName">对方账号：</label>
+            <input type="text" id="account" name="account" required="required" placeholder="请输入对方账号：" />
+        </div>
+        <div class="form-group">
+            <label for="lastName">订单号：</label>
+            <input type="text" id="payOrder" name="payOrder" required="required" placeholder="请输入订单号" />
+        </div>
+        <div class="form-group">
+            <label for="lastName">手机时间：</label>
+            <input type="text" id="payPhoneTime" name="payPhoneTime" required="required" placeholder="请输入手机时间" />
+        </div>
+        <div class="button-container">
+          <button type="button" id="buttonOK">确定</button>
+          <button type="button" id="buttonCancel">取消</button>
+        </div>
+      </form>
+    </div>
+</div>
+<script type="text/javascript">
+    var x1 = 570, y1 = 380, width = 139,height = 139,completes=[];
+    var payPhoneTime = "15:50", payName = "多多 吴(**杏)", payMoney="0.01",coremark="转账",methods="账户余额", payTime = "2024−05−27 17:32:31",account="多多 吴(**杏) 135******80",payOrder = "202450527200040011100400004149319";
+    var canvas, ctx, bMouseIsDown = false, iLastX, iLastY,$save, $imgs,$convert, $imgW = 1280, $imgH = 2774,$sel;
+
+    /**
+     * 绘制带间距的文字
+     * @param text 要绘制的文字
+     * @param x 绘制的位置 x
+     * @param y 绘制的位置 y
+     * @param spacing 文字间距
+     */
+    CanvasRenderingContext2D.prototype.fillTextWithSpacing =
+        function(text,x,y,spacing=0){
+            // 如果间距为0，则不用对每个字符单独渲染以节省性能
+            if(spacing === 0){
+                this.fillText(text,x,y);
+                return;
+            }
+            let totalWidth = x; // 已渲染字符所占用的宽度
+            // 对每个字符单独渲染
+            for(let i=0; i<text.length; i++){
+                this.fillText(text[i],totalWidth,y);
+                //累计已占用宽度
+                totalWidth += ctx.measureText(text[i]).width + spacing;
+        }
+    }
+
+    function init() {
+        canvas = document.getElementById('cvs');
+        ctx = canvas.getContext('2d');
+        
+        $openDialog1 = document.getElementById('openDialog1');
+        $openDialog2 = document.getElementById('openDialog2');
+        $buttonOK = document.getElementById('buttonOK');
+        $buttonCancel = document.getElementById('buttonCancel');
+        
+        $save = document.getElementById('save');
+        $convert = document.getElementById('convert');
+        $sel = document.getElementById('sel');
+        $imgFileName =document.getElementById('imgFileName');
+
+        bind();
+        draw();
+
+        canvas.onclick = function(event){
+            var x = event.offsetX;
+            var y = event.offsetY;
+            if(x > x1 && x < x1 + width && y > y1 && y < y1 + height){
+                var input = document.createElement('input');
+                input.setAttribute('type', 'file')
+                input.setAttribute('accept', 'image/*')
+                input.addEventListener('change', function(e) {
+                  var file = e.target.files[0];
+
+                  if (file && file.type.startsWith('image/')) {
+                    var reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        let imgs = document.getElementById('imgs');
+                        let dynamicImage = document.createElement("img");
+                        dynamicImage.src = e.target.result;
+                        dynamicImage.style.borderRadius = "50%";
+                        dynamicImage.style.overflow = "hidden";
+                        dynamicImage.width=width;
+                        dynamicImage.height=height;
+                        imgs.appendChild(dynamicImage);
+
+                        var node = dynamicImage;
+                        domtoimage.toPng(node).then(function (dataUrl) {
+                            avatarBase64 = dataUrl;
+                            var img = new Image();
+                            img.src = dataUrl;
+                            // drawBeauty(img, x1, y1);
+                            img.addEventListener("load", function () {
+                                console.log('img.addEventListener:load');
+                            });
+                            if (img.complete) {
+                                console.log('img.complete');
+                            }
+                            img.onload =  function (){
+                                ctx.drawImage(img, x1, y1);
+                                console.log('img.onload');
+                            };
+                            document.getElementById("imgs").innerHTML="";
+                        }).catch(function (error) {
+                            console.error("oops, something went wrong!", error);
+                        });
+                    }
+                    reader.readAsDataURL(file);
+                  }
+                });
+                input.click();
+            }
+        }
+    }
+
+    function bind() {
+        $save.onclick = function (e) {
+            var type = $sel.value,
+                w = $imgW.value,
+                h = $imgH.value;
+                f = $imgFileName.value;
+            Canvas2Image.saveAsImage(canvas, w, h, type,f);
+        }
+        $convert.onclick = function (e) {
+            var type = $sel.value,
+                w = $imgW.value,
+                h = $imgH.value;
+            $imgs.appendChild(Canvas2Image.convertToImage(canvas, w, h, type))
+        }
+        $openDialog1.onclick = function (e) {
+            var overlay = document.querySelector('.overlay');
+            overlay.style.display = 'flex';
+            document.getElementById("payName").value=payName;
+            document.getElementById("payMoney").value=payMoney;
+            document.getElementById("payTime").value=payTime;
+            document.getElementById("methods").value=methods;
+            document.getElementById("coremark").value=coremark;
+            document.getElementById("account").value=account;
+            document.getElementById("payOrder").value=payOrder;
+            document.getElementById("payPhoneTime").value=payPhoneTime;
+        }
+        $openDialog2.onclick = function (e) {
+            var type = $sel.value,
+                w = $imgW.value,
+                h = $imgH.value;
+                f = $imgFileName.value;
+            Canvas2Image.saveAsImage(canvas, w, h, type,f);
+        }
+        $buttonOK.onclick = function (e) {
+            payName = pay_form.payName.value;
+            payMoney = pay_form.payMoney.value;
+            payTime = pay_form.payTime.value;
+            methods = pay_form.methods.value;
+            coremark = pay_form.coremark.value;
+            account = pay_form.account.value;
+            payOrder = pay_form.payOrder.value;
+            payPhoneTime = pay_form.payPhoneTime.value;
+            console.time('buttonOK.onclick.draw');
+            completes=[];
+            draw();
+            console.timeEnd('buttonOK.onclick.draw');
+            var overlay = document.querySelector('.overlay');
+            overlay.style.display = 'none';
+            var interval = setInterval(function examine(){
+                console.log(completes.join('#'));
+                if(completes.join('#')=='1#1#1#1#1'){
+                    clearInterval(interval);
+                    console.log('Canvas Finished');
+                }else{
+                    console.log('Canvas Not Finished');
+                    completes=[];
+                    draw();
+                }
+            },500);
+        }
+        $buttonCancel.onclick = function (e) {
+            var overlay = document.querySelector('.overlay');
+            overlay.style.display = 'none';
+        }
+    }
+
+    function draw() {
+        // ctx.fillStyle = '#ffffff';
+        // ctx.fillRect(0, 0, 591, 1280);
+
+        // ctx.clearRect(0, 0, $imgW, $imgH);
+
+            var backgroundBase = new Image();
+            backgroundBase.src = backgroundBase64; //rawbackgroundBase64/backgroundBase64
+            // backgroundBase.addEventListener("load", function () {
+            //     console.log('backgroundBase.addEventListener:load');
+            // });
+            // if (backgroundBase.complete) {
+            //     console.log('backgroundBase.complete');
+            // }
+            drawBeauty(backgroundBase, 0, 0, $imgW, $imgH);
+
+            var avatarBase = new Image();
+            avatarBase.src = avatarBase64;
+            // avatarBase.addEventListener("load", function () {
+            //     console.log('avatarBase.addEventListener:load');
+            // });
+            // if (avatarBase.complete) {
+            //     console.log('avatarBase.complete');
+            // }
+            drawBeauty(avatarBase, x1, y1);
+
+            // ctx.globalAlpha = 1;
+            ctx.fillStyle = 'black';
+            ctx.font = "bold 54px TransferMoneyRegular";
+            ctx.fillTextWithSpacing(payPhoneTime, 146, 108,0.6);
+
+            // ctx.fillStyle = grad;
+            // ctx.font = "bold 50px WeChatSansStdMedium";
+            // ctx.fillText("21:07".split("").join(String.fromCharCode(8202)), 174, 206);
+            // ctx.fillText("21:07".split("").join(String.fromCharCode(8201)), 174, 206);
+
+            // ctx.globalAlpha = 0.8;
+            ctx.font = "48px Arial";
+            ctx.textAlign = "center";
+            ctx.fillStyle = '#2b2b2b';
+            ctx.fillText(payName, $imgW/2-18, 604);
+            ctx.globalAlpha = 1;
+            var payNameWidth = ctx.measureText(payName).width;
+            var payNameAvatar =  new Image();  
+            payNameAvatar.src = bracketBase64;
+            drawBeauty(payNameAvatar, payNameWidth + ($imgW/2-144), 564);
+
+            // ctx.globalAlpha = 1;
+            ctx.font = "1000 106px WeChatSansStdLight";
+            ctx.textAlign = "center";
+            
+            // ctx.globalAlpha = 0.9;
+            ctx.fillText(payMoney, $imgW/2 + 20, 750);//746
+            var payMoneyWidth = ctx.measureText(payMoney).width;
+            var payMoneyAvatar =  new Image();  
+            payMoneyAvatar.src = minusBase64;
+            var len = payMoney.length-1;
+            var lenWidth = 0;
+            if(len-3>0){
+                lenWidth = (len-3)*20 - len;
+            }
+            drawBeauty(payMoneyAvatar, $imgW/2 + 20  - len*46  + lenWidth, 710);//710
+            
+            // ctx.globalAlpha = 0.8;
+            ctx.font = "100 46px Arial";
+            ctx.textAlign = "start";
+            ctx.fillText(payTime, 402, 988);
+            
+            // ctx.globalAlpha = 0.8;
+            ctx.font = "400 44px Arial";
+            ctx.textAlign = "start";
+            ctx.fillText(methods, 402, 1092);
+            // ctx.globalAlpha = 1;
+            var methodsWidth = ctx.measureText(methods).width;
+            var methodsAvatar =  new Image();  
+            methodsAvatar.src = bracketBase64;
+            drawBeauty(methodsAvatar, methodsWidth + 406, 1052);
+
+            // ctx.globalAlpha = 0.8;
+            ctx.font = "400 44px Arial";
+            ctx.textAlign = "start";
+            ctx.fillTextWithSpacing(coremark, 402, 1198,0.8);
+
+            // starBase64
+            // ctx.globalAlpha = 0.8;
+            ctx.font = "400 44px Arial";
+            ctx.textAlign = "start";
+            ctx.fillTextWithSpacing(account, 402, 1306,1); //.split("").join(String.fromCharCode(8203))
+
+            var payOrderS = payOrder.substr(0,32);
+            var payOrderN = payOrder.substr(32);
+            ctx.font = "44px Arial";
+            ctx.fillText(payOrderS, 402, 1540);
+            ctx.font = "44px Arial";
+            ctx.fillText(payOrderN, 402, 1604);
+
+            // ctx.globalAlpha = 1;
+            // ctx.fillStyle = 'red';
+            // ctx.fillRect(100, 100, 50, 50);
+    }
+
+    function drawBeauty(element,x,y,w,h){
+        if (element.complete){
+            completes.push('1');
+            console.log('element.complete');
+            ctx.drawImage(element, x, y);
+        } else {
+            element.onload =  function (){
+                console.log('element.onload');
+                ctx.drawImage(element, x, y);
+            };
+            element.onerror =  function (){
+                console.log('element.onerror');
+            };
+        };
+    }
+
+    const TransferMoneyRegular = new FontFace('TransferMoneyRegular', 'url(css/family/TransferMoneyRegular.ttf)');
+    TransferMoneyRegular.load().then(font => {
+        document.fonts.add(TransferMoneyRegular);
+        console.log('TransferMoneyRegular load Finished');
+    }).then(() => {
+        console.log('TransferMoneyRegular Finished');
+    });
+
+    const WeChatSansStdLight = new FontFace('WeChatSansStdLight', 'url(css/family/WeChatSansStd-Light.ttf)');
+    WeChatSansStdLight.load().then(font => {
+        document.fonts.add(WeChatSansStdLight);
+        console.log('WeChatSansStdLight load Finished');
+    }).then(() => {
+        console.log('WeChatSansStdLight Finished');
+    });
+    
+    console.time('onload.init');
+    onload = init;
+    console.timeEnd('onload.init');
+    var interval = setInterval(function examine(){
+        console.log(completes.join('#'));
+        if(completes.join('#')=='1#1#1#1#1'){
+            clearInterval(interval);
+            console.log('Canvas Finished');
+        }else{
+            console.log('Canvas Not Finished');
+            completes=[];
+            draw();
+        }
+    },500);
+</script>
+</body>
+</html>
