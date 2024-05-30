@@ -1,0 +1,37 @@
+@font-face {
+    font-family: TransferMoneyMedium;
+    src:url("TransferMoneyMedium.ttf") format('truetype');;
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: TransferMoneyRegular;
+    src:url("TransferMoneyRegular.ttf") format('truetype');;
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: WeChatSansStdRegular;
+    src:url("WeChatSansStd-Regular.ttf");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: WeChatSansStdMedium;
+    src:url("WeChatSansSS-Medium.ttf");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: WeChatSansStdLight;
+    src:url("WeChatSansStd-Light.ttf");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: WeChatSansStdBold;
+    src:url("WeChatSansStd-Bold.ttf");
+    font-weight: normal;
+    font-style: normal;
+}
