@@ -389,16 +389,19 @@
             // ctx.globalAlpha = 1;
             ctx.font = "1000 106px WeChatSansStdLight";
             ctx.textAlign = "center";
-            
+            var payMoneyN = addCommas(payMoney);
             // ctx.globalAlpha = 0.9;
-            ctx.fillText(payMoney, $imgW/2 + 20, 750);//746
-            var payMoneyWidth = ctx.measureText(payMoney).width;
+            ctx.fillText(payMoneyN, $imgW/2 + 20, 750);//746
+            var payMoneyWidth = ctx.measureText(payMoneyN).width;
             var payMoneyAvatar =  new Image();  
             payMoneyAvatar.src = minusBase64;
-            var len = payMoney.length-1;
+            var len = payMoneyN.length-1;
             var lenWidth = 0;
             if(len-3>0){
                 lenWidth = (len-3)*20 - len;
+                var pml = Math.floor(payMoney).toString().length;
+                var pm = Math.floor(pml/4);
+                lenWidth = lenWidth + pm * 6;
             }
             drawBeauty(payMoneyAvatar, $imgW/2 + 20  - len*46  + lenWidth, 710);//710
             
@@ -438,6 +441,26 @@
             // ctx.globalAlpha = 1;
             // ctx.fillStyle = 'red';
             // ctx.fillRect(100, 100, 50, 50);
+    }
+
+    function addCommas(number) {
+        // 将数字转换为字符串
+        let numStr = number.toString();
+        
+        // 分割整数部分和小数部分
+        let parts = numStr.split('.');
+        let integerPart = parts[0];
+        let decimalPart = parts[1] || ''; // 如果没有小数部分，则为空字符串
+        
+        // 插入逗号到整数部分
+        let integerWithCommas = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        
+        // 如果有小数部分，则重新组合整数部分和小数部分
+        if (decimalPart !== '') {
+            return integerWithCommas + '.' + decimalPart;
+        } else {
+            return integerWithCommas;
+        }
     }
 
     function drawBeauty(element,x,y,w,h){
