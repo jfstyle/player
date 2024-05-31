@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>2</title>
+<style>
+    .doc {
+        width: 591px;
+        height: 1280px;
+        margin: 0 auto;
+    }
+
+    canvas {
+        display: block;
+        border: 2px solid #888;
+    }
+
+    .floating-buttons {
+        position: fixed;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+    }
+
+    .floating-button {
+        background-color: #f44336;
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        text-align: center;
+        font-size: 18px;
+        line-height: 60px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.25);
+        cursor: pointer;
+        transition: width 0.3s ease;
+    }
+
+    .floating-button:hover {
+        background-color: #ff665c;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      display: none;
+    }
+    
+    .modal {
+      width: 400px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      width: 20%;
+      float: left;
+      display: block;
+      font-weight: bold;
+    }
+    
+    .form-group input {
+      width: 70%;
+      padding: 5px;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+    }
+    
+    .button-container {
+      text-align: right;
+    }
+    
+    .button-container button {
+      padding: 5px 10px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    
+    .button-container button + button {
+      margin-left: 5px;
+    }
+</style>
+<script type="text/javascript">
+    document.write("<link rel='stylesheet' href='css/family/family.css?random="+Math.random()+"' type='text/css' rel='stylesheet' \/>");
+    document.write("<script type='text/javascript' src='js/canvas2image.js?random=" + Math.random() + "'><\/script>");
+    document.write("<script type='text/javascript' src='js/dom-to-image.min.js?random=" + Math.random() + "'><\/script>");
+    document.write("<script type='text/javascript' src='js/index2.js?random=" + Math.random() + "'><\/script>");
+</script>
+</head>
+<body>
+<div class="doc">
+    <canvas width="591" height="1280" id="cvs">您的浏览器不支持 HTML5 canvas 标签。请更换浏览器</canvas>
+    <div>
+        <div style="font-family: WeChatSansStdRegular;visibility: hidden;font-size: 0;">WeChatSansStdRegular</div>
+        <div style="font-family: WeChatSansStdMedium;visibility: hidden;font-size: 0;">WeChatSansStdMedium</div>
+        <div style="font-family: WeChatSansStdBold;visibility: hidden;font-size: 0;">WeChatSansStdBold</div>
+        <div style="font-family: WeChatSansStdLight;visibility: hidden;font-size: 0;">WeChatSansStdLight</div>
+        <div style="display: none;">
+            width : <input type="number" value="591" id="imgW" /><br/>
+            height : <input type="number" value="1280" id="imgH" /><br>
+            fileName: <input type="text" placeholder="optional" id="imgFileName"><br/>
+            <button id="save">save</button> or <button id="convert">convert to</button> as: 
+                <select id="sel">
+                    <option value="png">png</option>
+                    <option value="jpeg">jpeg</option>
+                    <option value="bmp">bmp</option>
+                </select><br/>
+            <!--
+            <p>
+                支付名称: <input type="text" placeholder="扫二维码付款-给童话夫" style="width: 50%;" id="payName" value="扫二维码付款-给童话夫"><br/>
+                支付金额: <input type="text" placeholder="50000.00" style="width: 50%;" id="payMoney" value="50000.00"><br/>
+                转帐时间: <input type="text" placeholder="2023年10月12日 18:46:49" style="width: 50%;" id="payTime" value="2023年10月12日 18:46:49"><br/>
+                转帐单号: <input type="text" placeholder="10001071012023101200866939776110" style="width: 50%;" id="payOrder" value="10001071012023101200866939776110"><br/>
+                手机时间: <input type="text" placeholder="18:50" style="width: 50%;" id="payPhoneTime" value="18:50"><br/>
+            </p>
+            <p style="font-family: WeChatSansStdRegular">WeChatSansStd Regular 常规 ¥123，456,78-9.00 张三 21:07 ></p>
+            <p style="font-family: WeChatSansStdMedium">WeChatSansStd Medium 中等 ¥123，456,78-9.00 张三 21:07 ></p>
+            <p style="font-family: WeChatSansStdBold">WeChatSansStd Bold 粗体 ¥123，456,78-9.00 张三 21:07 ></p>
+            <p style="font-family: WeChatSansStdLight">WeChatSansStd Light 细体 ¥123，456,78-9.00 张三 21:07 ></p>
+            -->
+        </div>
+    </div>
+    <div id="imgs"></div>
+    <div class="floating-buttons">
+      <div class="floating-button" id="openDialog1">修改</div>
+      <div class="floating-button" id="openDialog2">保存</div>
+    </div>
+</div>
+<div class="overlay">
+    <div class="modal">
+      <form name="pay_form" action="" method="post">
+        <div class="form-group">
+          <label for="payName">支付名称：</label>
+          <input type="text" id="payName" name="payName" required="required" placeholder="请输入支付名称" />
+        </div>
+        <div class="form-group">
+          <label for="payMoney">支付金额：</label>
+          <input type="text" id="payMoney" name="payMoney" required="required" placeholder="请输入支付金额" />
+        </div>
+        <div class="form-group">
+            <label for="payTime">转帐时间：</label>
+            <input type="text" id="payTime" name="payTime" required="required" placeholder="请输入转帐时间" />
+        </div>
+        <div class="form-group">
+            <label for="payfullName">收款名称：</label>
+            <input type="text" id="payfullName" name="payfullName" required="required" placeholder="请输入收款名称" />
+        </div>
+        <div class="form-group">
+            <label for="payPhoneTime">手机时间：</label>
+            <input type="text" id="payPhoneTime" name="payPhoneTime" required="required" placeholder="请输入手机时间" />
+        </div>
+        <div class="button-container">
+          <button type="button" id="buttonOK">确定</button>
+          <button type="button" id="buttonCancel">取消</button>
+        </div>
+      </form>
+    </div>
+</div>
+<script type="text/javascript">
+    var x1 = 261, y1 = 171, width = 66,height = 66,completes=[];
+    var payName = "龙达服装商行", payMoney="13400.00", payTime = "2024–05–30 12:33:44",payfullName = "**丽(个人)",payPhoneTime = "12:33";
+    var canvas, ctx, bMouseIsDown = false, iLastX, iLastY,$save, $imgs,$convert, $imgW = 591, $imgH = 1280,$sel;
+
+    /**
+     * 绘制带间距的文字
+     * @param text 要绘制的文字
+     * @param x 绘制的位置 x
+     * @param y 绘制的位置 y
+     * @param spacing 文字间距
+     */
+    CanvasRenderingContext2D.prototype.fillTextWithSpacing =
+        function(text,x,y,spacing=0){
+            // 如果间距为0，则不用对每个字符单独渲染以节省性能
+            if(spacing === 0){
+                this.fillText(text,x,y);
+                return;
+            }
+            let totalWidth = x; // 已渲染字符所占用的宽度
+            // 对每个字符单独渲染
+            for(let i=0; i<text.length; i++){
+                this.fillText(text[i],totalWidth,y);
+                //累计已占用宽度
+                totalWidth += ctx.measureText(text[i]).width + spacing;
+        }
+    }
+
+    function init() {
+        canvas = document.getElementById('cvs');
+        ctx = canvas.getContext('2d');
+        
+        $openDialog1 = document.getElementById('openDialog1');
+        $openDialog2 = document.getElementById('openDialog2');
+        $buttonOK = document.getElementById('buttonOK');
+        $buttonCancel = document.getElementById('buttonCancel');
+        
+        $save = document.getElementById('save');
+        $convert = document.getElementById('convert');
+        $sel = document.getElementById('sel');
+        // $imgs = document.getElementById('imgs');
+        // $imgW = document.getElementById('imgW');
+        // $imgH = document.getElementById('imgH');
+        $imgFileName =document.getElementById('imgFileName');
+
+        bind();
+        draw();
+
+        // canvas.addEventListener('click', function (e) {
+        //     const canvasInfo = canvas.getBoundingClientRect()
+        //     console.log(ctx.isPointInPath(e.clientX - canvasInfo.left, e.clientY - canvasInfo.top))
+        // })
+        
+        // canvas判断是否点击在绘制的图形上
+        // canvas.addEventListener("click", function(ev){
+        //     result = ctx.isPointInPath(ev.layerX, ev.layerY) ? "点在方块上" : "点在方块外";
+        // });
+
+        canvas.onclick = function(event){
+            var x = event.offsetX;
+            var y = event.offsetY;
+            if(x > x1 && x < x1 + width && y > y1 && y < y1 + height){
+                var input = document.createElement('input');
+                input.setAttribute('type', 'file')
+                input.setAttribute('accept', 'image/*')
+                input.addEventListener('change', function(e) {
+                  var file = e.target.files[0];
+
+                  if (file && file.type.startsWith('image/')) {
+                    var reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        let imgs = document.getElementById('imgs');
+                        let dynamicImage = document.createElement("img");
+                        dynamicImage.src = e.target.result;
+                        dynamicImage.style.borderRadius = "50%";
+                        dynamicImage.style.overflow = "hidden";
+                        dynamicImage.width=width;
+                        dynamicImage.height=height;
+                        imgs.appendChild(dynamicImage);
+
+                        var node = dynamicImage;
+                        domtoimage.toPng(node).then(function (dataUrl) {
+                            avatarBase64 = dataUrl;
+                            var img = new Image();
+                            img.src = dataUrl;
+                            // drawBeauty(img, x1, y1);
+                            img.addEventListener("load", function () {
+                                console.log('img.addEventListener:load');
+                            });
+                            if (img.complete) {
+                                console.log('img.complete');
+                            }
+                            img.onload =  function (){
+                                ctx.drawImage(img, x1, y1);
+                                console.log('img.onload');
+                            };
+                            document.getElementById("imgs").innerHTML="";
+                        }).catch(function (error) {
+                            console.error("oops, something went wrong!", error);
+                        });
+                    }
+                    reader.readAsDataURL(file);
+                  }
+                });
+                input.click();
+            }
+        }
+    }
+
+    function bind() {
+        // canvas.onmousedown = function(e) {
+        //     bMouseIsDown = true;
+        //     iLastX = e.clientX - canvas.offsetLeft + (window.pageXOffset||document.body.scrollLeft||document.documentElement.scrollLeft);
+        //     iLastY = e.clientY - canvas.offsetTop + (window.pageYOffset||document.body.scrollTop||document.documentElement.scrollTop);
+        // }
+        // canvas.onmouseup = function() {
+        //     bMouseIsDown = false;
+        //     iLastX = -1;
+        //     iLastY = -1;
+        // }
+        // canvas.onmousemove = function(e) {
+        //     if (bMouseIsDown) {
+        //         var iX = e.clientX - canvas.offsetLeft + (window.pageXOffset||document.body.scrollLeft||document.documentElement.scrollLeft);
+        //         var iY = e.clientY - canvas.offsetTop + (window.pageYOffset||document.body.scrollTop||document.documentElement.scrollTop);
+        //         ctx.moveTo(iLastX, iLastY);
+        //         ctx.lineTo(iX, iY);
+        //         ctx.stroke();
+        //         iLastX = iX;
+        //         iLastY = iY;
+        //     }
+        // };
+        $save.onclick = function (e) {
+            var type = $sel.value,
+                w = $imgW.value,
+                h = $imgH.value;
+                f = $imgFileName.value;
+            Canvas2Image.saveAsImage(canvas, w, h, type,f);
+        }
+        $convert.onclick = function (e) {
+            var type = $sel.value,
+                w = $imgW.value,
+                h = $imgH.value;
+            $imgs.appendChild(Canvas2Image.convertToImage(canvas, w, h, type))
+        }
+        $openDialog1.onclick = function (e) {
+            var overlay = document.querySelector('.overlay');
+            overlay.style.display = 'flex';
+            document.getElementById("payName").value=payName;
+            document.getElementById("payMoney").value=payMoney;
+            document.getElementById("payTime").value=payTime;
+            document.getElementById("payfullName").value=payfullName;
+            document.getElementById("payPhoneTime").value=payPhoneTime;
+        }
+        $openDialog2.onclick = function (e) {
+            var type = $sel.value,
+                w = $imgW.value,
+                h = $imgH.value;
+                f = $imgFileName.value;
+            Canvas2Image.saveAsImage(canvas, w, h, type,f);
+        }
+        $buttonOK.onclick = function (e) {
+            payName = pay_form.payName.value;
+            payMoney = pay_form.payMoney.value;
+            payTime = pay_form.payTime.value;
+            payfullName = pay_form.payfullName.value;
+            payPhoneTime = pay_form.payPhoneTime.value;
+            console.time('buttonOK.onclick.draw');
+            completes=[];
+            draw();
+            console.timeEnd('buttonOK.onclick.draw');
+            var overlay = document.querySelector('.overlay');
+            overlay.style.display = 'none';
+            var interval = setInterval(function examine(){
+                console.log(completes.join('#'));
+                if(completes.join('#')=='1#1'){
+                    clearInterval(interval);
+                    console.log('Canvas Finished');
+                }else{
+                    console.log('Canvas Not Finished');
+                    completes=[];
+                    draw();
+                }
+            },500);
+        }
+        $buttonCancel.onclick = function (e) {
+            var overlay = document.querySelector('.overlay');
+            overlay.style.display = 'none';
+        }
+    }
+
+    function draw() {
+        // ctx.fillStyle = '#ffffff';
+        // ctx.fillRect(0, 0, 591, 1280);
+
+        // ctx.clearRect(0, 0, $imgW, $imgH);
+
+            var backgroundBase = new Image();
+            backgroundBase.src = backgroundBase64;//rawbackgroundBase64
+            // backgroundBase.addEventListener("load", function () {
+            //     console.log('backgroundBase.addEventListener:load');
+            // });
+            // if (backgroundBase.complete) {
+            //     console.log('backgroundBase.complete');
+            // }
+            drawBeauty(backgroundBase, 0, 0, $imgW, $imgH);
+
+            var avatarBase = new Image();
+            avatarBase.src = avatarBase64;
+            // avatarBase.addEventListener("load", function () {
+            //     console.log('avatarBase.addEventListener:load');
+            // });
+            // if (avatarBase.complete) {
+            //     console.log('avatarBase.complete');
+            // }
+            drawBeauty(avatarBase, x1, y1);
+
+            ctx.fillStyle = 'black';
+            ctx.font = "bold 24px TransferMoneyRegular";
+            ctx.fillTextWithSpacing(payPhoneTime, 30, 44,0.6);
+
+            // ctx.fillStyle = grad;
+            // ctx.font = "bold 50px WeChatSansStdMedium";
+            // ctx.fillText("21:07".split("").join(String.fromCharCode(8202)), 174, 206);
+            // ctx.fillText("21:07".split("").join(String.fromCharCode(8201)), 174, 206);
+            ctx.globalAlpha = 0.8;
+            ctx.font = "540 21px WeChatSansStdRegular";
+            ctx.textAlign = "center";
+            ctx.fillText(payName, $imgW/2, 277);//156
+            ctx.globalAlpha = 1;
+            ctx.font = "bold 50px WeChatSansStdLight";
+            ctx.textAlign = "center";
+            // var payMoneyN = addCommas(payMoney);
+            // ctx.fillText(payMoneyN, $imgW/2, 344);
+            // ctx.globalAlpha = 1;
+            // var payMoneyWidth = ctx.measureText(payMoneyN).width;
+            // var payMoneyAvatar =  new Image();  
+            // payMoneyAvatar.src = minus;
+            // var len = payMoneyN.length-1;
+            // var lenWidth = 0;
+            // if(len-3>0){
+            //     lenWidth = (len-3)*20 - len;
+            //     var pml = Math.floor(payMoney).toString().length;
+            //     var pm = Math.floor(pml/4);
+            //     lenWidth = lenWidth + pm * 6;
+            // }
+            // drawBeauty(payMoneyAvatar, $imgW/2 + 20  - len*36  + lenWidth, 288);
+            
+            var condition = true;
+            let count = 0;
+            const intervalMoney = setInterval(function() {
+                count++;
+                myArray = addMomney(payMoney);
+                condition = myArray.includes(0);
+                console.log("Money Canvas " + count + " condition: "+condition);
+                if (!condition) {
+                    setTimeout(function() {
+                        clearInterval(intervalMoney);
+                        console.log("stop setInterval");
+                    }, 100); 
+                }
+            }, 500);
+            if (condition) {
+                console.log("Money Canvas Not Finished");
+            } else {
+                console.log("Money Canvas Finished");
+            }
+            
+            ctx.globalAlpha = 0.8;
+            ctx.font = "22px Arial";
+            ctx.textAlign = "start";
+            ctx.fillTextWithSpacing(payTime, 185, 458,0.2);
+
+            ctx.font = "20px WeChatSansStdRegular";
+            ctx.fillTextWithSpacing(payfullName, 185, 668,0.8);
+            ctx.globalAlpha = 1;
+            // ctx.fillStyle = 'red';
+            // ctx.fillRect(100, 100, 50, 50);
+    }
+
+    function addMomney(payMoney){
+        var nmony = numFormat(payMoney);
+        var arrMone = nmony.split("");
+        var dot = []; 
+        var thousands = [];
+        var arrMoneFlase = [];
+        for (i = 0; i < arrMone.length; i++) { 
+            var index = numberArr.findIndex(item => item.name === arrMone[i]);
+            if (index === -1) {
+                console.log('未找到符合条件的对象');
+            } else {
+                var monyBase = new Image();
+                monyBase.src = numberArr[index].value;
+                monyBase.onload = function() {
+                    var height = monyBase.naturalHeight;
+                    var width = monyBase.naturalWidth;
+                };
+                var xi =0,yi=0,wi=0,hi=0;
+                var moneyl =  Math.floor(payMoney).toString().length;
+                if(isNaN(arrMone[i])){
+                    if(arrMone[i]=="."){
+                        xi = $imgW/2 - (arrMone.length - i)*26-thousands.length*12 + arrMone.length*16 + 0 +moneyl;
+                        yi = 300;
+                        wi = 13;
+                        hi = 48;
+                        // ctx.drawImage(monyBase, $imgW/2 - (arrMone.length - i)*26-thousands.length*12 + arrMone.length*16,300,13,48);
+                        dot.push(1);
+                    }else{
+                        xi = $imgW/2 - (arrMone.length - i)*26-thousands.length*12-dot.length*12+ arrMone.length*16 + 0+moneyl;
+                        yi = 306;
+                        wi = 13;
+                        hi = 48;
+                        // ctx.drawImage(monyBase, $imgW/2 - (arrMone.length - i)*26-thousands.length*12-dot.length*12+ arrMone.length*16,306,13,48);
+                        thousands.push(1);
+                    }
+                }else{
+                    xi = $imgW/2 - (arrMone.length - i)*26-thousands.length*12-dot.length*12+ arrMone.length*16 + 0+moneyl;
+                        yi = 310;
+                        wi = 26;
+                        hi = 38;
+                    // ctx.drawImage(monyBase, $imgW/2 - (arrMone.length - i)*26-thousands.length*12-dot.length*12+ arrMone.length*16, 310,26,38);
+                }
+                // console.log(monyBase.complete);
+                if (monyBase.complete){
+                    arrMoneFlase.push(1);
+                    ctx.drawImage(monyBase, xi,yi,wi,hi);
+                }else{
+                    arrMoneFlase.push(0);
+                }
+            }
+        }
+        var minusBase = new Image();
+        minusBase.src = numberj;
+        if (minusBase.complete){
+            arrMoneFlase.push(1);
+            ctx.drawImage(minusBase, $imgW/2 - (arrMone.length-thousands.length-thousands.length)*13-thousands.length*10-dot.length*10, 310,22,40);
+        }else{
+            arrMoneFlase.push(0);
+        }
+        return arrMoneFlase;
+    }
+
+    function addCommas(number) {
+        // 将数字转换为字符串
+        let numStr = number.toString();
+        
+        // 分割整数部分和小数部分
+        let parts = numStr.split('.');
+        let integerPart = parts[0];
+        let decimalPart = parts[1] || ''; // 如果没有小数部分，则为空字符串
+        
+        // 插入逗号到整数部分
+        let integerWithCommas = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        
+        // 如果有小数部分，则重新组合整数部分和小数部分
+        if (decimalPart !== '') {
+            return integerWithCommas + '.' + decimalPart;
+        } else {
+            return integerWithCommas;
+        }
+    }
+
+    function numFormat(num) {
+        var res = num.toString().replace(/\d+/, function (n) { // 先提取整数部分
+            return n.replace(/(\d)(?=(\d{3})+$)/g, function ($1) {
+                return $1 + ',';
+            });
+        })
+        return res;
+    }
+
+    function drawBeauty(element,x,y,w,h){
+        if (element.complete){
+            completes.push('1');
+            console.log('element.complete');
+            ctx.drawImage(element, x, y);
+        } else {
+            element.onload =  function (){
+                console.log('element.onload');
+                ctx.drawImage(element, x, y);
+            };
+            element.onerror =  function (){
+                console.log('element.onerror');
+            };
+        };
+    }
+
+    const TransferMoneyRegular = new FontFace('TransferMoneyRegular', 'url(css/family/TransferMoneyRegular.ttf)');
+    TransferMoneyRegular.load().then(font => {
+        document.fonts.add(TransferMoneyRegular);
+        console.log('TransferMoneyRegular load Finished');
+    }).then(() => {
+        console.log('TransferMoneyRegular Finished');
+    });
+
+    const WeChatSansStdRegular = new FontFace('WeChatSansStdRegular', 'url(css/family/WeChatSansStd-Regular.ttf)');
+    WeChatSansStdRegular.load().then(font => {
+        document.fonts.add(WeChatSansStdRegular);
+        console.log('WeChatSansStdRegular load Finished');
+    }).then(() => {
+        console.log('WeChatSansStdRegular Finished');
+    });
+
+    const WeChatSansStdLight = new FontFace('WeChatSansStdLight', 'url(css/family/WeChatSansStd-Light.ttf)');
+    WeChatSansStdLight.load().then(font => {
+        document.fonts.add(WeChatSansStdLight);
+        console.log('WeChatSansStdLight load Finished');
+    }).then(() => {
+        console.log('WeChatSansStdLight Finished');
+    });
+
+    console.time('onload.init');
+    onload = init;
+    console.timeEnd('onload.init');
+    var interval = setInterval(function examine(){
+        console.log(completes.join('#'));
+        if(completes.join('#')=='1#1'){
+            clearInterval(interval);
+            console.log('Canvas Finished');
+        }else{
+            console.log('Canvas Not Finished');
+            completes=[];
+            draw();
+        }
+    },500);
+</script>
+</body>
+</html>
