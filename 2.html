@@ -167,6 +167,10 @@
             <input type="text" id="payfullName" name="payfullName" required="required" placeholder="请输入收款名称" />
         </div>
         <div class="form-group">
+            <label for="category">分类名称：</label>
+            <input type="text" id="category" name="category" required="required" placeholder="请输入分类名称：" />
+        </div>
+        <div class="form-group">
             <label for="payPhoneTime">手机时间：</label>
             <input type="text" id="payPhoneTime" name="payPhoneTime" required="required" placeholder="请输入手机时间" />
         </div>
@@ -179,7 +183,7 @@
 </div>
 <script type="text/javascript">
     var x1 = 261, y1 = 171, width = 66,height = 66,completes=[];
-    var payName = "龙达服装商行", payMoney="13400.00", payTime = "2024–05–30 12:33:44",payfullName = "**丽(个人)",payPhoneTime = "12:33";
+    var payName = "龙达服装商行", payMoney="13400.00", payTime = "2024–05–30 12:33:44",payfullName = "**丽(个人)",payPhoneTime = "12:33",category = "服饰装扮";
     var canvas, ctx, bMouseIsDown = false, iLastX, iLastY,$save, $imgs,$convert, $imgW = 591, $imgH = 1280,$sel;
 
     /**
@@ -329,6 +333,7 @@
             document.getElementById("payMoney").value=payMoney;
             document.getElementById("payTime").value=payTime;
             document.getElementById("payfullName").value=payfullName;
+            document.getElementById("category").value=category;
             document.getElementById("payPhoneTime").value=payPhoneTime;
         }
         $openDialog2.onclick = function (e) {
@@ -344,6 +349,7 @@
             payTime = pay_form.payTime.value;
             payfullName = pay_form.payfullName.value;
             payPhoneTime = pay_form.payPhoneTime.value;
+            category = pay_form.category.value;
             console.time('buttonOK.onclick.draw');
             completes=[];
             draw();
@@ -452,6 +458,13 @@
 
             ctx.font = "20px WeChatSansStdRegular";
             ctx.fillTextWithSpacing(payfullName, 185, 668,0.8);
+
+            ctx.globalAlpha = 0.4;
+            ctx.font = "540 20px Arial";
+            ctx.textAlign = "right";
+            ctx.fillText(category, 534, 864);
+
+            ctx.fillText("添加", 534, 926);
             ctx.globalAlpha = 1;
             // ctx.fillStyle = 'red';
             // ctx.fillRect(100, 100, 50, 50);
