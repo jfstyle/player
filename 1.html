@@ -384,7 +384,15 @@
             var payNameWidth = ctx.measureText(payName).width;
             var payNameAvatar =  new Image();  
             payNameAvatar.src = bracketBase64;
-            drawBeauty(payNameAvatar, payNameWidth + ($imgW/2-144), 564);
+            if(payName.length<9){
+                var cale = 9 - payName.length;
+                diffeWidth =  cale * 18;
+                drawBeauty(payNameAvatar, payNameWidth + ($imgW/2-144) + diffeWidth, 564);
+            } else {
+                var cale = payName.length - 9;
+                diffeWidth =  cale * 24;
+                drawBeauty(payNameAvatar, payNameWidth + ($imgW/2-144) - diffeWidth, 564);
+            }
 
             // ctx.globalAlpha = 1;
             ctx.font = "1000 106px WeChatSansStdLight";
