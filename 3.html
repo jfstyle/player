@@ -416,7 +416,16 @@
             var payNameWidth = ctx.measureText(payName).width;
             var payNameAvatar =  new Image();  
             payNameAvatar.src = bracketBase64;
-            drawBeauty(payNameAvatar, ($imgW/2) + payNameWidth - 74, 240);
+            var diffeWidth = 0;
+            if(payName.length<9){
+                var cale = 9 - payName.length;
+                diffeWidth =  cale * 12;
+                drawBeauty(payNameAvatar, ($imgW/2) + payNameWidth - 74 + diffeWidth, 240);
+            } else {
+                var cale = payName.length - 9;
+                diffeWidth =  cale * 10;
+                drawBeauty(payNameAvatar, ($imgW/2) + payNameWidth - 74 - diffeWidth, 240);
+            }
 
             ctx.font = "bold 50px WeChatSansStdLight";
             ctx.textAlign = "center";
