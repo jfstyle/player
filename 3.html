@@ -100,6 +100,23 @@
     .button-container button + button {
       margin-left: 5px;
     }
+
+    fieldset .form-group label {
+      width: 26%;
+      float: left;
+      display: block;
+      font-weight: bold;
+    }
+    
+    fieldset .form-group input {
+      width: 10%;
+      padding: 5px;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+    }
+    fieldset .form-group {
+      margin-bottom: 0px;
+    }
 </style>
 <script type="text/javascript">
     document.write("<link rel='stylesheet' href='css/family/family.css?random="+Math.random()+"' type='text/css' rel='stylesheet' \/>");
@@ -170,10 +187,41 @@
             <label for="payOrder">对方帐户：</label>
             <input type="text" id="payOrder" name="payOrder" required="required" placeholder="请输入对方帐户" />
         </div>
-        <div class="form-group">
-            <label for="payPhoneTime">手机时间：</label>
-            <input type="text" id="payPhoneTime" name="payPhoneTime" required="required" placeholder="请输入手机时间" />
-        </div>
+        <fieldset>
+            <legend>状态栏</legend>
+            <div class="form-group">
+                <label for="payPhoneTime">手机时间：</label>
+                <input type="text" id="payPhoneTime" name="payPhoneTime" required="required" placeholder="请输入手机时间" />
+            </div>
+            <div class="form-group">
+                <label for="location">显示定位：</label>
+                <input type="checkbox" id="location" name="location" value="location" checked />
+            </div>
+            <div class="form-group">
+                <label for="SIMCard1">手机信号：</label>
+                <select name="SIMCard1" id="SIMCard1">
+                    <option value="1">1格</option>
+                    <option value="2">2格</option>
+                    <option value="3">3格</option>
+                    <option value="4" selected>4格</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="wifiMove">wifi信号：</label>
+                <select name="wifiMove" id="wifiMove">
+                    <!-- <option value="1">1格</option> -->
+                    <option value="2">2格</option>
+                    <option value="3">3格</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="phonePower" id="labelPhonePower">电量：</label>
+                <input type="range" id="phonePower" name="phonePower" min="0" title="50" max="100"  
+                style="width: 68%;"
+                oninput="updatePowerValue(this.value)" 
+                onmousemove="this.setAttribute('title',+ this.value)">
+            </div>
+          </fieldset>
         <div class="button-container">
           <button type="button" id="buttonOK">确定</button>
           <button type="button" id="buttonCancel">取消</button>
@@ -183,7 +231,8 @@
 </div>
 <script type="text/javascript">
     var x1 = 262, y1 = 152, width = 66,height = 66,completes=[];
-    var payName = "超越自我(**梅)", payMoney="10000.00", payTime = "2024–05–29 13:39:45",payfullName = "超越自我(**梅) 191******68",payPhoneTime = "13:42",payOrder = "20240529200040011100720085496271";
+    var payName = "超越自我(**梅)", payMoney="10000.00", payTime = "",payfullName = "超越自我(**梅) 191******68",payOrder = "",
+    payPhoneTime = "",position = true,wifiMove = 2,phonePower = 76,simMode = false,simCard1 = 4;
     var canvas, ctx, bMouseIsDown = false, iLastX, iLastY,$save, $imgs,$convert, $imgW = 591, $imgH = 1280,$sel;
 
     /**
@@ -209,7 +258,44 @@
         }
     }
 
+    function dateFtt(fmt, date) {
+        var o = {
+            "M+": date.getMonth() + 1, //月份   
+            "d+": date.getDate(), //日   
+            "h+": date.getHours(), //小时   
+            "m+": date.getMinutes(), //分   
+            "s+": date.getSeconds(), //秒   
+            "q+": Math.floor((date.getMonth() + 3) / 3), //季度   
+            "S": date.getMilliseconds() //毫秒   
+        };
+        if(/(y+)/.test(fmt))
+            fmt = fmt.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for(var k in o)
+            if(new RegExp("(" + k + ")").test(fmt))
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+	}
+
+    function updatePowerValue(val) {
+            document.getElementById('labelPhonePower').innerText = val+"电量：";
+            document.getElementById("phonePower").value = val;
+    }
+    function generateRandomNumber() {
+        let num;
+        do {
+            num = Math.floor(Math.random() * 90) + 10;
+        } while (num % 10 === 0);
+        return num;
+    }
     function init() {
+        var myDate = new Date();
+        payTime = dateFtt("yyyy–MM–dd hh:mm:ss", myDate)
+        payPhoneTime = dateFtt("hh:mm", myDate);
+        var order1 = dateFtt("yyyyMMdd", myDate);
+        var order2 = generateRandomNumber();
+        var order3 = Math.floor(Math.random() * 90000000) + 10000000;;
+        payOrder = `${order1}200040011100${order2}00${order3}`;
+
         canvas = document.getElementById('cvs');
         ctx = canvas.getContext('2d');
         
@@ -292,6 +378,8 @@
     }
 
     function bind() {
+        updatePowerValue(phonePower);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         // canvas.onmousedown = function(e) {
         //     bMouseIsDown = true;
         //     iLastX = e.clientX - canvas.offsetLeft + (window.pageXOffset||document.body.scrollLeft||document.documentElement.scrollLeft);
@@ -335,6 +423,10 @@
             document.getElementById("payfullName").value=payfullName;
             document.getElementById("payOrder").value=payOrder;
             document.getElementById("payPhoneTime").value=payPhoneTime;
+            document.getElementById("wifiMove").selectedIndex=(wifiMove-2);
+            document.getElementById("location").checked=position;
+            document.getElementById("phonePower").value=phonePower;
+            document.getElementById("SIMCard1").selectedIndex=(simCard1-1);
         }
         $openDialog2.onclick = function (e) {
             var type = $sel.value,
@@ -350,6 +442,10 @@
             payfullName = pay_form.payfullName.value;
             payPhoneTime = pay_form.payPhoneTime.value;
             payOrder = pay_form.payOrder.value;
+            wifiMove = pay_form.wifiMove.value;
+            position = pay_form.location.checked;
+            phonePower = pay_form.phonePower.value;
+            simCard1 = pay_form.SIMCard1.value;
             console.time('buttonOK.onclick.draw');
             completes=[];
             draw();
@@ -358,7 +454,7 @@
             overlay.style.display = 'none';
             var interval = setInterval(function examine(){
                 console.log(completes.join('#'));
-                if(completes.join('#')=='1#1#1'){
+                if(completes.join('#')=='1#1#1#1#1#1'){
                     clearInterval(interval);
                     console.log('Canvas Finished');
                 }else{
@@ -375,6 +471,8 @@
     }
 
     function draw() {
+        updatePowerValue(phonePower);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         // ctx.fillStyle = '#ffffff';
         // ctx.fillRect(0, 0, 591, 1280);
 
@@ -404,10 +502,70 @@
             ctx.font = "bold 24px TransferMoneyRegular";
             ctx.fillTextWithSpacing(payPhoneTime, 30, 44,0.6);
 
+            var avatarpositionBase = new Image();
+            if(position){
+                avatarpositionBase.src = positionBase;
+            }else{
+                avatarpositionBase.src = positionNullBase;
+            }
+            drawBeauty(avatarpositionBase, 96, 24);
+
+            // simMode && simCard1
+            ctx.fillStyle = '#f6f6f6';
+            ctx.fillRect($imgW-125, 20, 30, 28);
+            var avatarSingleCardBase = new Image();
+            switch (Number(simCard1)) {
+                case 1:
+                    avatarSingleCardBase.src = `${singleCard1}`;
+                    break;
+                case 2:
+                    avatarSingleCardBase.src = `${singleCard2}`;
+                    break;
+                case 3:
+                    avatarSingleCardBase.src = `${singleCard3}`;
+                    break;
+                case 4:
+                    avatarSingleCardBase.src = `${singleCard4}`;
+                    break;
+                default:
+                    avatarSingleCardBase.src = `${singleCard4}`;
+            }
+            drawBeauty(avatarSingleCardBase, $imgW-125, 26);
+
+            ctx.fillStyle = '#f6f6f6';
+            ctx.fillRect($imgW-95, 20, 30, 28);
+            var avatarWiFiBase = new Image();
+            switch (Number(wifiMove)) {
+                case 1:
+                    avatarWiFiBase.src = `${wifi1}`;
+                    break;
+                case 2:
+                    avatarWiFiBase.src = `${wifi2}`;
+                    break;
+                case 3:
+                    avatarWiFiBase.src = `${wifi3}`;
+                    break;
+                default:
+                    avatarWiFiBase.src = `${wifi3}`;
+            }
+            drawBeauty(avatarWiFiBase, $imgW-95, 25);
+            
+            ctx.strokeStyle = '#f4f4f4';
+            ctx.lineJoin = "round";
+            ctx.lineWidth = 7.4;
+            ctx.strokeRect($imgW-56, 32, 23, 7.4);
+
+            const width = 22 * (phonePower / 100);
+            ctx.strokeStyle = '#000000';
+            ctx.lineJoin = "round";
+            ctx.lineWidth = 6.4;
+            ctx.strokeRect($imgW-56, 32.2, width, 6.4);
+
             // ctx.fillStyle = grad;
             // ctx.font = "bold 50px WeChatSansStdMedium";
             // ctx.fillText("21:07".split("").join(String.fromCharCode(8202)), 174, 206);
             // ctx.fillText("21:07".split("").join(String.fromCharCode(8201)), 174, 206);
+            ctx.fillStyle = 'black';
             ctx.globalAlpha = 0.8;
             ctx.font = "540 22px Arial";//WeChatSansStdRegular
             ctx.textAlign = "center";
@@ -617,7 +775,7 @@
     console.timeEnd('onload.init');
     var interval = setInterval(function examine(){
         console.log(completes.join('#'));
-        if(completes.join('#')=='1#1#1'){
+        if(completes.join('#')=='1#1#1#1#1#1'){
             clearInterval(interval);
             console.log('Canvas Finished');
         }else{
