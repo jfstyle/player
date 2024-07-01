@@ -100,6 +100,23 @@
     .button-container button + button {
       margin-left: 5px;
     }
+
+    fieldset .form-group label {
+      width: 26%;
+      float: left;
+      display: block;
+      font-weight: bold;
+    }
+    
+    fieldset .form-group input {
+      width: 10%;
+      padding: 5px;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+    }
+    fieldset .form-group {
+      margin-bottom: 0px;
+    }
 </style>
 <script type="text/javascript">
     document.write("<link rel='stylesheet' href='css/family/family.css?random="+Math.random()+"' type='text/css' rel='stylesheet' \/>");
@@ -170,10 +187,64 @@
             <label for="category">分类名称：</label>
             <input type="text" id="category" name="category" required="required" placeholder="请输入分类名称：" />
         </div>
-        <div class="form-group">
-            <label for="payPhoneTime">手机时间：</label>
-            <input type="text" id="payPhoneTime" name="payPhoneTime" required="required" placeholder="请输入手机时间" />
-        </div>
+
+        <fieldset>
+            <legend>状态栏</legend>
+            <div class="form-group">
+                <label for="payPhoneTime">手机时间：</label>
+                <input type="text" id="payPhoneTime" name="payPhoneTime" required="required" placeholder="请输入手机时间" />
+            </div>
+            <div class="form-group">
+                <label for="location">显示定位：</label>
+                <input type="checkbox" id="location" name="location" value="location" checked />
+            </div>
+            <!-- <div class="form-group">
+                <label for="SIMMode">双卡模式：</label>
+                <input type="checkbox" id="SIMMode" name="SIMMode" value="SIMMode" />
+            </div> -->
+            <div class="form-group">
+                <label for="SIMCard1">手机信号：</label>
+                <select name="SIMCard1" id="SIMCard1">
+                    <option value="1">1格</option>
+                    <option value="2">2格</option>
+                    <option value="3">3格</option>
+                    <option value="4" selected>4格</option>
+                </select>
+            </div>
+            <!-- <div class="form-group">
+                <label for="SIMCard2">卡2信息：</label>
+                <select name="SIMCard2" id="SIMCard2" disabled>
+                    <option value="1">1格</option>
+                    <option value="2">2格</option>
+                    <option value="3">3格</option>
+                    <option value="4" selected>4格</option>
+                </select>
+            </div> -->
+            <div class="form-group">
+                <label for="wifiMove">wifi信号：</label>
+                <select name="wifiMove" id="wifiMove">
+                    <!-- <option value="1">1格</option> -->
+                    <option value="2">2格</option>
+                    <option value="3">3格</option>
+                </select>
+            </div>
+            <!-- <div class="form-group">
+                <label for="NetworkMode">网络模式：</label>
+                <select name="NetworkMode" id="NetworkMode">
+                    <option value="1">5G</option>
+                    <option value="2">4G</option>
+                    <option value="3" selected>WIFI</option>
+                </select>
+            </div> -->
+            <div class="form-group">
+                <label for="phonePower" id="labelPhonePower">电量：</label>
+                <input type="range" id="phonePower" name="phonePower" min="0" title="50" max="100"  
+                style="width: 68%;"
+                oninput="updatePowerValue(this.value)" 
+                onmousemove="this.setAttribute('title',+ this.value)">
+            </div>
+          </fieldset>
+        
         <div class="button-container">
           <button type="button" id="buttonOK">确定</button>
           <button type="button" id="buttonCancel">取消</button>
@@ -183,8 +254,9 @@
 </div>
 <script type="text/javascript">
     var x1 = 261, y1 = 171, width = 66,height = 66,completes=[];
-    var payName = "龙达服装商行", payMoney="13400.00", payTime = "2024–05–30 12:33:44",payfullName = "**丽(个人)",payPhoneTime = "12:33",category = "服饰装扮";
-    var canvas, ctx, bMouseIsDown = false, iLastX, iLastY,$save, $imgs,$convert, $imgW = 591, $imgH = 1280,$sel;
+    var payName = "龙达服装商行", payMoney="13400.00", payTime = "2024–05–30 12:33:44",payfullName = "**丽(个人)",category = "服饰装扮",
+    payPhoneTime = "12:33",position = true,wifiMove = 2,phonePower = 76,simMode = false,simCard1 = 4;
+    var canvas, ctx, bMouseIsDown = false, iLastX, iLastY,$save, $imgs,$convert, $imgW = 591, $imgH = 1280,$sel,$buttonSIMMode;
 
     /**
      * 绘制带间距的文字
@@ -209,7 +281,18 @@
         }
     }
 
+    function updatePowerValue(val) {
+            document.getElementById('labelPhonePower').innerText = val+"电量：";
+            document.getElementById("phonePower").value = val;
+    }
     function init() {
+        const now = new Date();
+        var hours = now.getHours();
+        var minutes = now.getMinutes();
+        hours = (hours < 10) ? '0' + hours : hours;
+        minutes = (minutes < 10) ? '0' + minutes : minutes;
+        payPhoneTime = `${hours}:${minutes}`;
+        
         canvas = document.getElementById('cvs');
         ctx = canvas.getContext('2d');
         
@@ -217,6 +300,7 @@
         $openDialog2 = document.getElementById('openDialog2');
         $buttonOK = document.getElementById('buttonOK');
         $buttonCancel = document.getElementById('buttonCancel');
+        // $buttonSIMMode = document.getElementById('SIMMode');
         
         $save = document.getElementById('save');
         $convert = document.getElementById('convert');
@@ -313,6 +397,17 @@
         //         iLastY = iY;
         //     }
         // };
+
+        // $buttonSIMMode.onclick = function (e) {
+        //     var element = document.getElementById("SIMCard2");
+        //     if (element.disabled) {
+        //         element.disabled = false;// element.removeAttribute('disabled');
+        //         simMode = false;
+        //     } else {
+        //         simMode = true;
+        //         element.disabled = true;
+        //     }
+        // }
         $save.onclick = function (e) {
             var type = $sel.value,
                 w = $imgW.value,
@@ -335,6 +430,10 @@
             document.getElementById("payfullName").value=payfullName;
             document.getElementById("category").value=category;
             document.getElementById("payPhoneTime").value=payPhoneTime;
+            document.getElementById("wifiMove").selectedIndex=(wifiMove-2);
+            document.getElementById("location").checked=position;
+            document.getElementById("phonePower").value=phonePower;
+            document.getElementById("SIMCard1").selectedIndex=(simCard1-1);
         }
         $openDialog2.onclick = function (e) {
             var type = $sel.value,
@@ -350,6 +449,10 @@
             payfullName = pay_form.payfullName.value;
             payPhoneTime = pay_form.payPhoneTime.value;
             category = pay_form.category.value;
+            wifiMove = pay_form.wifiMove.value;
+            position = pay_form.location.checked;
+            phonePower = pay_form.phonePower.value;
+            simCard1 = pay_form.SIMCard1.value;
             console.time('buttonOK.onclick.draw');
             completes=[];
             draw();
@@ -358,7 +461,7 @@
             overlay.style.display = 'none';
             var interval = setInterval(function examine(){
                 console.log(completes.join('#'));
-                if(completes.join('#')=='1#1'){
+                if(completes.join('#')=='1#1#1#1#1'){
                     clearInterval(interval);
                     console.log('Canvas Finished');
                 }else{
@@ -375,6 +478,8 @@
     }
 
     function draw() {
+        updatePowerValue(phonePower);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         // ctx.fillStyle = '#ffffff';
         // ctx.fillRect(0, 0, 591, 1280);
 
@@ -404,6 +509,69 @@
             ctx.textAlign = "start";
             ctx.font = "bold 24px TransferMoneyRegular";
             ctx.fillTextWithSpacing(payPhoneTime, 30, 44,0.6);
+
+            var avatarpositionBase = new Image();
+            if(position){
+                avatarpositionBase.src = positionBase;
+            }else{
+                avatarpositionBase.src = positionNullBase;
+            }
+            drawBeauty(avatarpositionBase, 96, 24);
+
+            // simMode && simCard1
+            ctx.fillStyle = '#f6f6f6';
+            ctx.fillRect($imgW-125, 20, 30, 28);
+            var avatarSingleCardBase = new Image();
+            switch (Number(simCard1)) {
+                case 1:
+                    avatarSingleCardBase.src = `${singleCard1}`;
+                    break;
+                case 2:
+                    avatarSingleCardBase.src = `${singleCard2}`;
+                    break;
+                case 3:
+                    avatarSingleCardBase.src = `${singleCard3}`;
+                    break;
+                case 4:
+                    avatarSingleCardBase.src = `${singleCard4}`;
+                    break;
+                default:
+                    avatarSingleCardBase.src = `${singleCard4}`;
+            }
+            drawBeauty(avatarSingleCardBase, $imgW-125, 26);
+
+            ctx.fillStyle = '#f6f6f6';
+            ctx.fillRect($imgW-95, 20, 30, 28);
+            var avatarWiFiBase = new Image();
+            switch (Number(wifiMove)) {
+                case 1:
+                    avatarWiFiBase.src = `${wifi1}`;
+                    break;
+                case 2:
+                    avatarWiFiBase.src = `${wifi2}`;
+                    break;
+                case 3:
+                    avatarWiFiBase.src = `${wifi3}`;
+                    break;
+                default:
+                    avatarWiFiBase.src = `${wifi3}`;
+            }
+            drawBeauty(avatarWiFiBase, $imgW-95, 25);
+            
+            ctx.strokeStyle = '#f4f4f4';
+            ctx.lineJoin = "round";
+            ctx.lineWidth = 7.4;
+            ctx.strokeRect($imgW-56, 32, 23, 7.4);
+
+            const width = 22 * (phonePower / 100);
+            ctx.strokeStyle = '#000000';
+            ctx.lineJoin = "round";
+            ctx.lineWidth = 6.4;
+            ctx.strokeRect($imgW-56, 32.2, width, 6.4);
+
+            // var avatarPhonePowerBase = new Image();
+            // avatarPhonePowerBase.src = wifi1;
+            // drawBeauty(avatarPhonePowerBase, $imgW-95, 26);
 
             // ctx.fillStyle = grad;
             // ctx.font = "bold 50px WeChatSansStdMedium";
@@ -607,7 +775,7 @@
     console.timeEnd('onload.init');
     var interval = setInterval(function examine(){
         console.log(completes.join('#'));
-        if(completes.join('#')=='1#1'){
+        if(completes.join('#')=='1#1#1#1#1'){
             clearInterval(interval);
             console.log('Canvas Finished');
         }else{
