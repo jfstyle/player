@@ -192,6 +192,17 @@
             <input name="methods" value="yueBao" id="yueBao" type="radio" style="width: 4%;">余额宝
             <input name="methods" value="accountBalance" id="accountBalance" type="radio" style="width: 4%;">账户余额
         </div>
+        <div class="form-group">
+            <label for="integral">支付积分：</label>                  
+            <input name="integral" value="integral1" id="integral1" type="radio" style="width: 4%;">样式一
+            <input name="integral" value="integral2" id="integral2" type="radio" style="width: 4%;">样式二
+            <input name="integral" value="integral5" id="integral5" type="radio" style="width: 4%;">样式三
+        </div>
+        <div class="form-group">
+            <label for="scrollbar">滚动条：</label>                  
+            <input name="scrollbar" value="scrollbarYes" id="scrollbarYes" type="radio" style="width: 4%;">有
+            <input name="scrollbar" value="scrollbarNo" id="scrollbarNo" type="radio" style="width: 4%;">无
+        </div>
         <fieldset>
             <legend>状态栏</legend>
             <div class="form-group">
@@ -237,7 +248,7 @@
 <script type="text/javascript">
     var x1 = 262, y1 = 152, width = 66,height = 66,completes=[];
     var payName = "超越自我(**梅)", payMoney="10000.00", payTime = "",payfullName = "超越自我(**梅) 191******68",payOrder = "",
-    payPhoneTime = "",position = true,wifiMove = 2,phonePower = 76,simMode = false,simCard1 = 4,methods='yueBao';
+    payPhoneTime = "",position = true,wifiMove = 2,phonePower = 76,simMode = false,simCard1 = 4,methods='yueBao',integral='integral1',scrollbar='scrollbarNo';
     var canvas, ctx, bMouseIsDown = false, iLastX, iLastY,$save, $imgs,$convert, $imgW = 591, $imgH = 1280,$sel;
 
     /**
@@ -433,6 +444,8 @@
             document.getElementById("phonePower").value=phonePower;
             document.getElementById("SIMCard1").selectedIndex=(simCard1-1);
             document.getElementById(methods).checked=true;
+            document.getElementById(integral).checked=true;
+            document.getElementById(scrollbar).checked=true;
         }
         $openDialog2.onclick = function (e) {
             var type = $sel.value,
@@ -452,10 +465,24 @@
             position = pay_form.location.checked;
             phonePower = pay_form.phonePower.value;
             simCard1 = pay_form.SIMCard1.value;
-            var radios = document.getElementsByName('methods');
-            for (let i = 0; i < radios.length; i++) {
-                if (radios[i].checked) {
-                    methods = radios[i].value;
+            var radioMethods = document.getElementsByName('methods');
+            for (let i = 0; i < radioMethods.length; i++) {
+                if (radioMethods[i].checked) {
+                    methods = radioMethods[i].value;
+                    break;
+                }
+            }
+            var radioIntegrals = document.getElementsByName('integral');
+            for (let i = 0; i < radioIntegrals.length; i++) {
+                if (radioIntegrals[i].checked) {
+                    integral = radioIntegrals[i].value;
+                    break;
+                }
+            }
+            var radioScrollbars = document.getElementsByName('scrollbar');
+            for (let i = 0; i < radioScrollbars.length; i++) {
+                if (radioScrollbars[i].checked) {
+                    scrollbar = radioScrollbars[i].value;
                     break;
                 }
             }
@@ -467,7 +494,7 @@
             overlay.style.display = 'none';
             var interval = setInterval(function examine(){
                 console.log(completes.join('#'));
-                if(completes.join('#')=='1#1#1#1#1#1#1'){
+                if(completes.join('#')=='1#1#1#1#1#1#1#1'){
                     clearInterval(interval);
                     console.log('Canvas Finished');
                 }else{
@@ -588,6 +615,29 @@
                     methodsBase.src = accountBalance;
             }
             drawBeauty(methodsBase, 184, 470);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(174, 616, 330, 41);
+            var integralBase = new Image();
+            switch (integral) {
+                case 'integral1':
+                integralBase.src = integral1;
+                    break;
+                case 'integral2':
+                    integralBase.src = integral2;
+                    break;
+                case 'integral5':
+                    integralBase.src = integral5;
+                    break;
+                default:
+                integralBase.src = integral1;
+            }
+            drawBeauty(integralBase, 174, 616);
+
+            if(scrollbar == "scrollbarNo"){
+                ctx.fillStyle = '#f6f6f6';
+                ctx.fillRect($imgW-12, 140, 10, 1000);
+            }
 
             // ctx.fillStyle = grad;
             // ctx.font = "bold 50px WeChatSansStdMedium";
@@ -803,7 +853,7 @@
     console.timeEnd('onload.init');
     var interval = setInterval(function examine(){
         console.log(completes.join('#'));
-        if(completes.join('#')=='1#1#1#1#1#1#1'){
+        if(completes.join('#')=='1#1#1#1#1#1#1#1'){
             clearInterval(interval);
             console.log('Canvas Finished');
         }else{
