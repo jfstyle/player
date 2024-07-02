@@ -187,6 +187,11 @@
             <label for="payOrder">对方帐户：</label>
             <input type="text" id="payOrder" name="payOrder" required="required" placeholder="请输入对方帐户" />
         </div>
+        <div class="form-group">
+            <label for="methods">付款方式：</label>                  
+            <input name="methods" value="yueBao" id="yueBao" type="radio" style="width: 4%;">余额宝
+            <input name="methods" value="accountBalance" id="accountBalance" type="radio" style="width: 4%;">账户余额
+        </div>
         <fieldset>
             <legend>状态栏</legend>
             <div class="form-group">
@@ -232,7 +237,7 @@
 <script type="text/javascript">
     var x1 = 262, y1 = 152, width = 66,height = 66,completes=[];
     var payName = "超越自我(**梅)", payMoney="10000.00", payTime = "",payfullName = "超越自我(**梅) 191******68",payOrder = "",
-    payPhoneTime = "",position = true,wifiMove = 2,phonePower = 76,simMode = false,simCard1 = 4;
+    payPhoneTime = "",position = true,wifiMove = 2,phonePower = 76,simMode = false,simCard1 = 4,methods='yueBao';
     var canvas, ctx, bMouseIsDown = false, iLastX, iLastY,$save, $imgs,$convert, $imgW = 591, $imgH = 1280,$sel;
 
     /**
@@ -427,6 +432,7 @@
             document.getElementById("location").checked=position;
             document.getElementById("phonePower").value=phonePower;
             document.getElementById("SIMCard1").selectedIndex=(simCard1-1);
+            document.getElementById(methods).checked=true;
         }
         $openDialog2.onclick = function (e) {
             var type = $sel.value,
@@ -446,6 +452,13 @@
             position = pay_form.location.checked;
             phonePower = pay_form.phonePower.value;
             simCard1 = pay_form.SIMCard1.value;
+            var radios = document.getElementsByName('methods');
+            for (let i = 0; i < radios.length; i++) {
+                if (radios[i].checked) {
+                    methods = radios[i].value;
+                    break;
+                }
+            }
             console.time('buttonOK.onclick.draw');
             completes=[];
             draw();
@@ -454,7 +467,7 @@
             overlay.style.display = 'none';
             var interval = setInterval(function examine(){
                 console.log(completes.join('#'));
-                if(completes.join('#')=='1#1#1#1#1#1'){
+                if(completes.join('#')=='1#1#1#1#1#1#1'){
                     clearInterval(interval);
                     console.log('Canvas Finished');
                 }else{
@@ -560,6 +573,21 @@
             ctx.lineJoin = "round";
             ctx.lineWidth = 6.4;
             ctx.strokeRect($imgW-56, 32.2, width, 6.4);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(184, 470, 100, 24);
+            var methodsBase = new Image();
+            switch (methods) {
+                case 'yueBao':
+                    methodsBase.src = yueBao;
+                    break;
+                case 'accountBalance':
+                    methodsBase.src = accountBalance;
+                    break;
+                default:
+                    methodsBase.src = accountBalance;
+            }
+            drawBeauty(methodsBase, 184, 470);
 
             // ctx.fillStyle = grad;
             // ctx.font = "bold 50px WeChatSansStdMedium";
@@ -775,7 +803,7 @@
     console.timeEnd('onload.init');
     var interval = setInterval(function examine(){
         console.log(completes.join('#'));
-        if(completes.join('#')=='1#1#1#1#1#1'){
+        if(completes.join('#')=='1#1#1#1#1#1#1'){
             clearInterval(interval);
             console.log('Canvas Finished');
         }else{
